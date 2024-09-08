@@ -16,10 +16,10 @@ def saveCreadentials(OUTPUT_DIR,d):
         json.dump(d,idFile)
         idFile.close()  
 
-saveCreadentials(OUTPUT_DIR,d)
+# saveCreadentials(OUTPUT_DIR,d)
 
 #### 0.get credentials
-
+OUTPUT_DIR = ""
 with open(os.path.join(OUTPUT_DIR,"clientCredentials.json"),"r") as idFile:
     id=json.load(idFile)
 
@@ -30,7 +30,7 @@ params={
     "grant_type":"client_credentials",
     "client_id":id["clientID"],
     "client_secret":id["key"],
-    "scope":"api_offresdemploiv2"
+    "scope":"o2dsoffre api_offresdemploiv2"
 }
 
 
