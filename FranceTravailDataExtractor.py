@@ -1,7 +1,7 @@
 import requests
 import json
 import os
-
+import time
 
 #### Save credentials 
 """ OUTPUT_DIR="C:/Users/medsa/Desktop/projet_DE"
@@ -67,8 +67,6 @@ def requete_api(token_type:str, token:str):
     """
     Requête l'API de France Travail.
     """
-
-
     headers={
         "Accept": "application/json",
         "Authorization": f"{token_type} {token}"
@@ -82,8 +80,7 @@ def requete_api(token_type:str, token:str):
     except requests.exceptions.HTTPError as errh:
         print('HTTP Error:', errh)
 
-def main():
-    OUTPUT_DIR = ''
+def Extract_data(OUTPUT_DIR):
     credentials = get_credentials(OUTPUT_DIR=OUTPUT_DIR)
     client_id = credentials["clientID"]
     client_secret = credentials["key"]
@@ -94,8 +91,16 @@ def main():
                                     token=token)
         print(json.dumps(data, indent=4))
         print(headers)
+        file_name=str(time.gmtime().tm_year*10000+time.gmtime().tm_mon*100+time.gmtime().tm_mday)+"_offre_demplois.json"
+        data["resultats"]
+        for doc in data["resultats"]:
+            with open(OUTPUT_DIR+"/Elasticsearch/requirements/logstash/data/to_ingest/"+file_name,"+a") as idFile:
+                json.dump(doc,idFile)
+                idFile.write("\n")
+                idFile.close()
     except Exception as e:
         print("Erreur :", e)
 
 if __name__ == "__main__":
-    main()
+    OUTPUT_DIR = 'C:/Users/medsa/Desktop/projet_DE'
+    Extract_data(OUTPUT_DIR)
