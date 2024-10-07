@@ -89,10 +89,11 @@ def Extract_data(OUTPUT_DIR):
         token, token_type = get_access_token(client_id, client_secret)
         data, headers = requete_api(token_type= token_type,
                                     token=token)
-        print(json.dumps(data, indent=4))
-        print(headers)
+        #print(json.dumps(data, indent=4))
+        #print(headers)
         file_name=str(time.gmtime().tm_year*10000+time.gmtime().tm_mon*100+time.gmtime().tm_mday)+"_offre_demplois.json"
-        data["resultats"]
+        #data["resultats"]
+        print(json.dumps(data["resultats"][0],indent=4))
         for doc in data["resultats"]:
             with open(OUTPUT_DIR+"/Elasticsearch/requirements/logstash/data/to_ingest/"+file_name,"+a") as idFile:
                 json.dump(doc,idFile)
