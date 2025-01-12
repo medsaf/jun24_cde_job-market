@@ -238,7 +238,7 @@ def insert_job(job_offer: dict, company_id, contact_id) -> int:
             job_offer.get("secteurActivite"),
             moving,
             job_offer.get("experienceCommentaire"),
-            job_offer.get("lieuTravail", {}).get("commune"),
+            job_offer.get("lieuTravail", {}).get("commune", "75056"),
             company_id,
             contact_id,
             job_offer.get("id")
@@ -477,7 +477,7 @@ def insert_salary(job_id, job_offer: dict):
                     max_monthly_salary = 0
                     salary_description = "Invalid salary format (no string)"
                     logging.warning(f"no salary found for job_id {job_id}")
-                    return None
+                    
                     
                     
                 logging.debug(f"Extracted salary_str from commentaire: {salary_str}")
@@ -497,6 +497,8 @@ def insert_salary(job_id, job_offer: dict):
                 .replace("brut","")
                 .replace("BRUT","")
                 .replace("Brut","")
+                .replace("(","")
+                .replace(")","")
                 )
                 salary_str = add_space_around_numbers(salary_str)
                 salary_str=replace_space_between_numbers(salary_str)
@@ -512,6 +514,16 @@ def insert_salary(job_id, job_offer: dict):
                     
                         logging.info(f"match 2 reached")
                         logging.debug(f"salary_str : {salary_str}")
+                        pattern3= r'\d+\.\d+\.\d+'
+                        match3 = re.search(pattern3, salary_str)
+                        if match3:
+                            def modify_match(match):
+                                matched_str = match.group()  # Get the full match
+                                # Retain only the first two groups of digits
+                                return '.'.join(matched_str.split('.')[:2])
+
+                            # Replace the matched pattern with the modified result
+                            salary_str = re.sub(pattern3, modify_match, salary_str)
                         
                         #salary_str=add_space_before_slash(salary_str)
                         salary_str = add_space_around_numbers(salary_str)
@@ -534,7 +546,9 @@ def insert_salary(job_id, job_offer: dict):
                     max_monthly_salary = None
                     if any(keyword in salary_str for keyword in ["%", "CN", "CCN", "CC", "convention", "Convention", "RTT", "Cnn", "13 mois", "Coef", "coef", "grille", "Grille", " 66", "ségur", "Ségur"]) or ( "13 " in salary_str and "mois" in salary_str):
                         logging.warning("Found %/convention/13e mois")
-                        return None
+                        min_monthly_salary = 0
+                        max_monthly_salary = 0
+                        salary_description = salary_str
                     if min_monthly_salary.endswith('.'):
                             logging.info(f"salary ends with '.'")
                             min_monthly_salary = min_monthly_salary[:-1]
@@ -556,10 +570,14 @@ def insert_salary(job_id, job_offer: dict):
                     salary_description = salary_str
             except ValueError:
                 logging.error(f"Invalid salary format: {min_monthly_salary}")
-                return None
+                min_monthly_salary = 0
+                max_monthly_salary = 0
+                salary_description = 'invalid format'
             except Exception as e:
                 logging.exception(f"Unexpected error during salary conversion: {e}")
-                return None 
+                min_monthly_salary = 0
+                max_monthly_salary = 0
+                salary_description = 'conversion errror'
                 
                 
                    
@@ -586,10 +604,10 @@ def insert_salary(job_id, job_offer: dict):
 
         # Insert data into the salary table
         insert_query = """
-        INSERT IGNORE INTO salary (job_id, min_monthly_salary, max_monthly_salary, salary_description)
-        VALUES (%s, %s, %s, %s)
+        INSERT IGNORE INTO salary (job_id, min_monthly_salary, max_monthly_salary, salary_description, max_monthly_predicted)
+        VALUES (%s, %s, %s, %s, %s)
         """
-        cursor.execute(insert_query, (job_id, min_monthly_salary, max_monthly_salary, salary_description))
+        cursor.execute(insert_query, (job_id, min_monthly_salary, max_monthly_salary, salary_description, max_monthly_salary))
         logging.debug(f"Executed query: {cursor._executed}")
         
         
@@ -607,7 +625,9 @@ def insert_salary(job_id, job_offer: dict):
             
     except Error as e:
         logging.exception(f"Error inserting into salary: {e}")
-        return None
+        min_monthly_salary = 0.0
+        max_monthly_salary = 0.0
+        salary_description = "Invalid salary format"
         
 def hours_per_week(length_work_label):
             if length_work_label is None or length_work_label == "":
@@ -646,7 +666,7 @@ def hours_per_week(length_work_label):
                 
                 
             if hpw:
-                hpw = hpw.replace("H", ".00").replace(".00",".").replace(".30", ".5").replace(".15",".25").replace(' ','')
+                hpw = hpw.replace("H", ".00").replace(".00",".").replace(".30", ".5").replace(".15",".25").replace(' ','').replace('.Autre','')
                 try:
                     hpw = float(hpw)  # Convert to float for duration
                 except ValueError:
@@ -1251,7 +1271,6 @@ def insert_cities(job_offer: dict):
         Processes the location string to extract the city and arrondissement (if present).
         Returns:
         - city: The name of the city.
-        - arrondissement: The arrondissement part (if any), otherwise None.
         """
         # Extract the part after the hyphen
         location_part = location_string.split('-')[-1].strip()
@@ -1273,7 +1292,7 @@ def insert_cities(job_offer: dict):
         """
         city = process_location(travail.get("libelle"))
         
-        cursor.execute(insert_query, (travail.get("commune"), city, travail.get("latitude"), 
+        cursor.execute(insert_query, (travail.get("commune","75056"), city, travail.get("latitude"), 
         travail.get("longitude")))
         logging.debug(f"Executed query: {cursor._executed}")
         
