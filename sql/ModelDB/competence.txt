@@ -1,0 +1,8 @@
+DROP TABLE IF EXISTS competence;
+CREATE TABLE IF NOT EXISTS competence(
+exigence VARCHAR(1000)  ,
+code INT  ,
+competence_id VARCHAR(100) NOT NULL ,
+libelle VARCHAR(1000)  ,
+PRIMARY KEY ( competence_id )
+);

@@ -2,6 +2,9 @@ import requests
 import json
 import os
 import time
+import mysql.connector
+import pandas as pd
+import sys
 
 #### Save credentials 
 """ OUTPUT_DIR="C:/Users/medsa/Desktop/projet_DE"
@@ -34,7 +37,7 @@ def get_credentials(OUTPUT_DIR: str) -> dict[str,str]:
     :return: Dictionnaire contenant les accrédiations (clientID et key)
     """
 
-    with open(os.path.join(OUTPUT_DIR,"clientCredentials.json"),"r") as idFile:
+    with open(os.path.join(OUTPUT_DIR+"/FranceTravailAPIExtractor/","clientCredentials.json"),"r") as idFile:
         return json.load(idFile)
 
 def get_access_token(client_id: str, client_secret: str) -> tuple[str,str]:
@@ -84,7 +87,6 @@ def Extract_data(OUTPUT_DIR):
     credentials = get_credentials(OUTPUT_DIR=OUTPUT_DIR)
     client_id = credentials["clientID"]
     client_secret = credentials["key"]
-
     try : 
         token, token_type = get_access_token(client_id, client_secret)
         data, headers = requete_api(token_type= token_type,
@@ -93,7 +95,6 @@ def Extract_data(OUTPUT_DIR):
         #print(headers)
         file_name=str(time.gmtime().tm_year*10000+time.gmtime().tm_mon*100+time.gmtime().tm_mday)+"_offre_demplois.json"
         #data["resultats"]
-        print(json.dumps(data["resultats"][0],indent=4))
         for doc in data["resultats"]:
             with open(OUTPUT_DIR+"/Elasticsearch/requirements/logstash/data/to_ingest/"+file_name,"+a") as idFile:
                 json.dump(doc,idFile)
@@ -101,7 +102,8 @@ def Extract_data(OUTPUT_DIR):
                 idFile.close()
     except Exception as e:
         print("Erreur :", e)
+    return (data["resultats"])
 
-if __name__ == "__main__":
-    OUTPUT_DIR = 'C:/Users/medsa/Desktop/projet_DE'
-    Extract_data(OUTPUT_DIR)
+
+
+    

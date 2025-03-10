@@ -1,0 +1,36 @@
+artifact_path: FranceTravailSalaryExtract
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.11.7
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.2.2
+is_signature_from_type_hint: false
+mlflow_version: 2.20.3
+model_size_bytes: 18435931
+model_uuid: 2504b489625b464c854c9cf842129e5d
+run_id: 0eca2d4273ed42a0bd060afd1b620598
+saved_input_example_info:
+  artifact_path: input_example.json
+  pandas_orient: split
+  serving_input_path: serving_input_example.json
+  type: dataframe
+signature:
+  inputs: '[{"type": "string", "name": "rome_code", "required": true}, {"type": "string",
+    "name": "experience_required", "required": true}, {"type": "long", "name": "experience_length_months",
+    "required": true}, {"type": "long", "name": "is_alternance", "required": true},
+    {"type": "long", "name": "candidates_missing", "required": true}, {"type": "long",
+    "name": "moving_code", "required": true}, {"type": "long", "name": "insee_code",
+    "required": true}]'
+  outputs: '[{"type": "tensor", "tensor-spec": {"dtype": "int64", "shape": [-1]}}]'
+  params: null
+type_hint_from_example: false
+utc_time_created: '2025-03-01 08:43:09.028334'

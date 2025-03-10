@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/0/5b40ae79e8334c139763ff77ae1dcc98/artifacts
+end_time: 1740911089081
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 5b40ae79e8334c139763ff77ae1dcc98
+run_name: ambitious-crow-146
+run_uuid: 5b40ae79e8334c139763ff77ae1dcc98
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1740911071939
+status: 3
+tags: []
+user_id: medsa

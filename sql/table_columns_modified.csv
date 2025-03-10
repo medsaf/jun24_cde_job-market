@@ -1,0 +1,61 @@
+,table,filedName,dataType,option,primaryKey,foreignKey,referenceTable,pdType
+0,salaire,libelle,VARCHAR(1000),NULL,0,0,,object
+1,salaire,complement2,VARCHAR(1000),NULL,0,0,,object
+2,salaire,salaire_id,VARCHAR(100),NOT NULL,1,0,,object
+3,salaire,commentaire,VARCHAR(1000),NULL,0,0,,object
+4,salaire,complement1,VARCHAR(1000),NULL,0,0,,object
+0,entreprise,logo,VARCHAR(1000),NULL,0,0,,object
+1,entreprise,entreprise_id,VARCHAR(100),NOT NULL,1,0,,object
+2,entreprise,nom,VARCHAR(1000),NULL,0,0,,object
+3,entreprise,description,VARCHAR(1000),NULL,0,0,,object
+4,entreprise,entrepriseAdaptee,VARCHAR(1000),NULL,0,0,,object
+0,lieuTravail,commune,VARCHAR(10),NULL,0,0,,object
+1,lieuTravail,codePostal,FLOAT,NULL,0,0,,float64
+2,lieuTravail,longitude,FLOAT,NULL,0,0,,float64
+3,lieuTravail,latitude,FLOAT,NULL,0,0,,float64
+4,lieuTravail,libelle,VARCHAR(1000),NULL,0,0,,object
+5,lieuTravail,lieuTravail_id,VARCHAR(100),NOT NULL,1,0,,object
+0,contact,coordonnees3,VARCHAR(1000),NULL,0,0,,object
+1,contact,telephone,VARCHAR(1000),NULL,0,0,,object
+2,contact,coordonnees2,VARCHAR(1000),NULL,0,0,,object
+3,contact,urlPostulation,VARCHAR(1000),NULL,0,0,,object
+4,contact,nom,VARCHAR(1000),NULL,0,0,,object
+5,contact,contact_id,VARCHAR(100),NOT NULL,1,0,,object
+6,contact,courriel,VARCHAR(1000),NULL,0,0,,object
+7,contact,coordonnees1,VARCHAR(1000),NULL,0,0,,object
+0,competence,exigence,VARCHAR(1000),NULL,0,0,,object
+1,competence,code,INT,NULL,0,0,,Int64
+2,competence,competence_id,VARCHAR(100),NOT NULL,1,0,,object
+3,competence,libelle,VARCHAR(1000),NULL,0,0,,object
+0,job,dateCreation,VARCHAR(1000),NULL,0,0,,object
+1,job,qualificationCode,VARCHAR(1000),NULL,0,0,,object
+2,job,dateActualisation,DATETIME,NULL,0,0,,object
+3,job,dureeTravailLibelle,VARCHAR(1000),NULL,0,0,,object
+4,job,intitule,VARCHAR(1000),NULL,0,0,,object
+5,job,typeContratLibelle,VARCHAR(1000),NULL,0,0,,object
+6,job,secteurActiviteLibelle,VARCHAR(1000),NULL,0,0,,object
+7,job,description,TEXT,NULL,0,0,,object
+8,job,origineOffre,VARCHAR(1000),NULL,0,0,,object
+9,job,lieuTravail_id,VARCHAR(100),NULL,0,1,lieuTravail,object
+10,job,experienceLibelle,VARCHAR(1000),NULL,0,0,,object
+11,job,romeLibelle,VARCHAR(1000),NULL,0,0,,object
+12,job,nombrePostes,VARCHAR(1000),NULL,0,0,,object
+13,job,accessibleTH,VARCHAR(1000),NULL,0,0,,object
+14,job,codeNAF,VARCHAR(1000),NULL,0,0,,object
+15,job,contact_id,VARCHAR(100),NOT NULL,0,1,contact,object
+16,job,qualificationLibelle,VARCHAR(1000),NULL,0,0,,object
+17,job,dureeTravailLibelleConverti,VARCHAR(1000),NULL,0,0,,object
+18,job,agence,VARCHAR(1000),NULL,0,0,,object
+20,job,alternance,VARCHAR(1000),NULL,0,0,,object
+21,job,typeContrat,VARCHAR(1000),NULL,0,0,,object
+22,job,secteurActivite,VARCHAR(1000),NULL,0,0,,object
+23,job,competence_id,VARCHAR(100),NOT NULL,0,1,competence,object
+24,job,appellationlibelle,VARCHAR(1000),NULL,0,0,,object
+25,job,permis,VARCHAR(1000),NULL,0,0,,object
+26,job,natureContrat,VARCHAR(1000),NULL,0,0,,object
+27,job,entreprise_id,VARCHAR(100),NOT NULL,0,1,entreprise,object
+28,job,experienceExige,VARCHAR(1000),NULL,0,0,,object
+29,job,id,VARCHAR(100),NOT NULL,1,0,,object
+30,job,offresManqueCandidats,BOOLEAN,NULL,0,0,,bool
+31,job,salaire_id,VARCHAR(100),NOT NULL,0,1,salaire,object
+32,job,romeCode,VARCHAR(1000),NULL,0,0,,object

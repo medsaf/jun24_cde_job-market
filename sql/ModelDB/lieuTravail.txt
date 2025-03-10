@@ -1,0 +1,10 @@
+DROP TABLE IF EXISTS lieuTravail;
+CREATE TABLE IF NOT EXISTS lieuTravail(
+commune VARCHAR(10)  ,
+codePostal FLOAT  ,
+longitude FLOAT  ,
+latitude FLOAT  ,
+libelle VARCHAR(1000)  ,
+lieuTravail_id VARCHAR(100) NOT NULL ,
+PRIMARY KEY ( lieuTravail_id )
+);

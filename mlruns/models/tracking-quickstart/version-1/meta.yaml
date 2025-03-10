@@ -1,0 +1,14 @@
+aliases: []
+creation_timestamp: 1740818629169
+current_stage: None
+description: ''
+last_updated_timestamp: 1740818629169
+name: tracking-quickstart
+run_id: 0eca2d4273ed42a0bd060afd1b620598
+run_link: ''
+source: mlflow-artifacts:/0/0eca2d4273ed42a0bd060afd1b620598/artifacts/FranceTravailSalaryExtract
+status: READY
+status_message: null
+storage_location: mlflow-artifacts:/0/0eca2d4273ed42a0bd060afd1b620598/artifacts/FranceTravailSalaryExtract
+user_id: null
+version: 1

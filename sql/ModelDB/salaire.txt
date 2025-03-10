@@ -1,0 +1,9 @@
+DROP TABLE IF EXISTS salaire;
+CREATE TABLE IF NOT EXISTS salaire(
+libelle VARCHAR(1000)  ,
+complement2 VARCHAR(1000)  ,
+salaire_id VARCHAR(100) NOT NULL ,
+commentaire VARCHAR(1000)  ,
+complement1 VARCHAR(1000)  ,
+PRIMARY KEY ( salaire_id )
+);

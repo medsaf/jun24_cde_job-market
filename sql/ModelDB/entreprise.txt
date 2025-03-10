@@ -1,0 +1,9 @@
+DROP TABLE IF EXISTS entreprise;
+CREATE TABLE IF NOT EXISTS entreprise(
+logo VARCHAR(1000)  ,
+entreprise_id VARCHAR(100) NOT NULL ,
+nom VARCHAR(1000)  ,
+description VARCHAR(1000)  ,
+entrepriseAdaptee VARCHAR(1000)  ,
+PRIMARY KEY ( entreprise_id )
+);

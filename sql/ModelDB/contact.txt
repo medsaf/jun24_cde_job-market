@@ -1,0 +1,12 @@
+DROP TABLE IF EXISTS contact;
+CREATE TABLE IF NOT EXISTS contact(
+coordonnees3 VARCHAR(1000)  ,
+telephone VARCHAR(1000)  ,
+coordonnees2 VARCHAR(1000)  ,
+urlPostulation VARCHAR(1000)  ,
+nom VARCHAR(1000)  ,
+contact_id VARCHAR(100) NOT NULL ,
+courriel VARCHAR(1000)  ,
+coordonnees1 VARCHAR(1000)  ,
+PRIMARY KEY ( contact_id )
+);
