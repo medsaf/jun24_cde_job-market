@@ -9,6 +9,7 @@ from mysql.connector import Error
 import sys
 from datetime import datetime
 import logging
+from database import get_db_persistent
 
 HOURS_PER_MONTH = 151.67
 WEEKS_PER_MONTH = 4.33
@@ -168,8 +169,8 @@ def convert_to_mysql_datetime(iso_datetime: str) -> str:
     # Convert back to string in MySQL-compatible format
     return datetime_obj.strftime('%Y-%m-%d %H:%M:%S')
     
-def insert_job(job_offer: dict, company_id, contact_id) -> int:
-    global connection, cursor
+def insert_job(cursor, connection, job_offer: dict, company_id, contact_id) -> int:
+   
     moving = job_offer.get("deplacementCode",1)
     try:
         
@@ -429,18 +430,21 @@ def add_space_before_slash(input_str):
     return re.sub(pattern, r'\1 /', input_str)
 
   
-def insert_salary(job_id, job_offer: dict):
+def insert_salary(cursor, connection, job_id, job_offer: dict):
     """Insert a record into the `salary` table."""
     hpw, work_condition = hours_per_week(job_offer.get("dureeTravailLibelle"))
     if not hpw:
         hpw=35
     
-    global cursor, connection
+    
     
     def format_salaries(salary_str):
             tokens = salary_str.split()
             try:
                 if "à" in salary_str or "-" or " et " in salary_str:
+                    if salary_str.startswith("-"):
+                        salary_str=salary_str[1:]
+                        
                     salary_str = salary_str.replace("-","à").replace("et","à")
                     tokens = salary_str.split()
                     index1= tokens.index("à") -1
@@ -678,8 +682,8 @@ def hours_per_week(length_work_label):
             return hpw, work_condition
             
             
-def insert_contract(job_id, job_offer: dict):
-    global cursor, connection
+def insert_contract(cursor, connection, job_id, job_offer: dict):
+    
     
     
     try:
@@ -803,8 +807,8 @@ def insert_contract(job_id, job_offer: dict):
         
 
         
-def insert_benefits(salary_id, job_offer: dict):
-    global cursor, connection
+def insert_benefits(cursor, connection, salary_id, job_offer: dict):
+   
     """ insert a record inside the benefits tables"""
     
     complements= job_offer.get("salaire", {})
@@ -861,8 +865,8 @@ def insert_benefits(salary_id, job_offer: dict):
 
 
         
-def insert_salary_benefits(benefit_id, salary_id):
-    global cursor, connection
+def insert_salary_benefits(cursor, connection, benefit_id, salary_id):
+    
     """
     Insert a record into the `salary_benefits` table.
     If a record with the same salary_id and salary_benefit_id exists, update the existing record.
@@ -880,9 +884,9 @@ def insert_salary_benefits(benefit_id, salary_id):
     except Error as e:
         logging.exception(f"Error inserting salary benefit: {e}")
 
-def insert_companies(job_offer: dict ):
+def insert_companies(cursor, connection, job_offer: dict ):
     """Insert a record into the `companies` table."""
-    global cursor, connection
+    
     try:
         
         insert_query = """
@@ -909,9 +913,9 @@ def insert_companies(job_offer: dict ):
     except Error as e:
         logging.exception(f"Error inserting into companies: {e}")
         
-def insert_contact( job_offer: dict ):
+def insert_contact(cursor, connection, job_offer: dict ):
     """Insert a record into the `contact` table."""
-    global cursor, connection
+    
     coordonnees1=job_offer.get("contact", {}).get("coordonnees1", "")
     coordonnees2=job_offer.get("contact", {}).get("coordonnees2", "")
     coordonnees3=job_offer.get("contact", {}).get("coordonnees3", "")
@@ -950,9 +954,9 @@ def insert_contact( job_offer: dict ):
     except Error as e:
         logging.exception(f"Error inserting into contact: {e}")
 
-def insert_competencies( job_offer: dict):
+def insert_competencies(cursor, connection, job_offer: dict):
     """Insert a record into the `competencies` table."""
-    global cursor, connection
+   
     
     try:
         
@@ -979,9 +983,9 @@ def insert_competencies( job_offer: dict):
     except Error as e:
         logging.exception(f"Error inserting into competencies: {e}")
         
-def insert_job_competency( job_id, job_offer: dict):
+def insert_job_competency(cursor, connection, job_id, job_offer: dict):
     """Insert a record into the `job_competencies` table."""
-    global cursor, connection
+   
     try:
         
         insert_query = """
@@ -1001,8 +1005,8 @@ def insert_job_competency( job_id, job_offer: dict):
         logging.info(f"Inserted into `job_competencies`: {cursor.lastrowid}")
     except Error as e:
         logging.exception(f"Error inserting into job_competencies: {e}")   
-def insert_driver_license( job_offer: dict):
-    global cursor, connection
+def insert_driver_license(cursor, connection, job_offer: dict):
+    
     try:
         
        libelle = job_offer.get("permis", [{}])[0].get("libelle")
@@ -1027,8 +1031,8 @@ def insert_driver_license( job_offer: dict):
     except Error as e:
         logging.exception(f"Error inserting into driver_license: {e}")
         
-def insert_job_driver_license( job_id, driver_license_id, job_offer: dict ):
-    global cursor, connection
+def insert_job_driver_license(cursor, connection, job_id, driver_license_id, job_offer: dict ):
+    
     try:
         req= job_offer.get("permis", [{}])[0].get("exigence")
         if req:
@@ -1042,9 +1046,9 @@ def insert_job_driver_license( job_id, driver_license_id, job_offer: dict ):
     except Error as e:
         logging.exception(f"Error inserting into job_driver_license: {e}")
         
-def insert_job_node( job_offer: dict, naf_label: dict):
+def insert_job_node(cursor, connection, job_offer: dict, naf_label: dict):
      """Insert a record into the `job_node` table and its children naf, rome, actuvity sector & qualification."""
-     global cursor, connection
+     
      def get_naf_libelle(code):
         return naf_label.get(code, None)
      try:
@@ -1088,9 +1092,9 @@ def insert_job_node( job_offer: dict, naf_label: dict):
         logging.exception(f"Error inserting into job_node: {e}")
         connection.rollback()
         
-def insert_formation(job_id, job_offer: dict ):
+def insert_formation(cursor, connection, job_id, job_offer: dict ):
     
-    global cursor, connection
+    
     
     try:
         formations= job_offer.get("formations", [])
@@ -1149,8 +1153,8 @@ def insert_formation(job_id, job_offer: dict ):
     except Error as e:
         logging.exception(f"Error inserting into job_formation: {e}")
         
-def insert_professional_qualities(job_id, job_offer: dict ):
-    global cursor, connection
+def insert_professional_qualities(cursor, connection, job_id, job_offer: dict ):
+    
     qualities= job_offer.get("qualitesProfessionnelles", [])
     def insert_and_link_qualities( quality_label,quality_desc, job_id):
             if quality_label:
@@ -1198,8 +1202,8 @@ def insert_professional_qualities(job_id, job_offer: dict ):
     except Error as e:
         logging.exception(f"Error inserting into professional_qualities: {e}")
 
-def insert_languages( job_id, job_offer: dict):
-    global cursor, connection
+def insert_languages(cursor, connection, job_id, job_offer: dict):
+    
     languages= job_offer.get("langues", [])
     def insert_and_link_languages( label, job_id, requirement):
             if label:
@@ -1245,8 +1249,8 @@ def insert_languages( job_id, job_offer: dict):
         logging.exception(f"Error inserting into languages: {e}")
     
     
-def insert_moving( job_offer: dict):
-    global cursor, connection
+def insert_moving(cursor, connection, job_offer: dict):
+    
     try:
       
         insert_query="""
@@ -1262,8 +1266,8 @@ def insert_moving( job_offer: dict):
     except Error as e:
         logging.exception(f"Error inserting into moving: {e}")
         
-def insert_cities(job_offer: dict):
-    global cursor, connection
+def insert_cities(cursor, connection, job_offer: dict):
+    
     travail=job_offer.get("lieuTravail", {})
     
     def process_location(location_string):
@@ -1302,8 +1306,8 @@ def insert_cities(job_offer: dict):
     except Error as e:
          logging.exception(f"Error inserting into cities: {e}")
         
-def insert_requirements():
-    global cursor, connection
+def insert_requirements(cursor, connection):
+    
     insert_query="""
     INSERT IGNORE INTO requirements (requirements, label)
     VALUES("E", "Exige"),("S", "Souhaite"),("D", "Debutants acceptes")
@@ -1356,10 +1360,8 @@ def fetch_all_job_offers(department_code, rome_code, token_type, token):
 
 
 def establish_connection():
-    """Establish the global connection and cursor to the database."""
-    global connection, cursor  # Declare them as global
-    connection = None
-    cursor = None
+    
+    
     
     logging.basicConfig(
     level=logging.DEBUG,  
@@ -1375,27 +1377,19 @@ def establish_connection():
     
 
     try:
-        connection = mysql.connector.connect(
-            host='localhost',
-            database='mydb',
-            user='root',
-            password='',  # Leave empty for no password
-            port=3307,
-            charset='utf8mb4'  # Ensure proper encoding
-        )
+        
+        # Use the get_db function as a context manager to get the cursor and connection
+        cursor, connection = get_db_persistent()
         if connection.is_connected():
             logging.info("Connected to MySQL database")
-            cursor = connection.cursor(buffered=True)  # Create the cursor here
-            if not cursor:
-                raise RuntimeError("Failed to initialize the database cursor")
+            return cursor, connection
     except Error as e:
         logging.exception(f"Error while connecting to MySQL: {e}")
-        connection = None
-        cursor = None
-    insert_requirements()
-def close_connection():
+        return None, None
+    
+def close_connection(cursor, connection):
     """Close the global connection and cursor."""
-    global connection, cursor
+    
     if cursor:
         cursor.close()  # Close the cursor if it exists
     if connection and connection.is_connected():
@@ -1431,7 +1425,7 @@ def load_department_codes(csv_file_path: str) -> list[str]:
         raise
         
 
-def load_data_to_db(OUTPUT_DIR, csv_file_path):
+def load_data_to_db(cursor, connection, OUTPUT_DIR, csv_file_path):
     """
     Fetches job offers for each department code and inserts them into the database.
     """
@@ -1472,47 +1466,47 @@ def load_data_to_db(OUTPUT_DIR, csv_file_path):
                 for job_offer in job_offers:
                     try:
                         # Insert data into the respective tables
-                        insert_cities(job_offer)
-                        insert_job_node(job_offer, naf_labels)
-                        contact_id = insert_contact( job_offer)
-                        insert_moving(job_offer)
+                        insert_cities(cursor, connection,job_offer)
+                        insert_job_node(cursor, connection,job_offer, naf_labels)
+                        contact_id = insert_contact(cursor, connection, job_offer)
+                        insert_moving(cursor, connection,job_offer)
                         if not contact_id:
                             logging.warning(f"Failed to insert contact: {job_offer}")
                             contact_id = None
                             
-                        company_id = insert_companies( job_offer)
+                        company_id = insert_companies(cursor, connection, job_offer)
                         if not company_id:
                             logging.warning(f"Failed to insert company: {job_offer}")
                             company_id = None
                            
-                        job_id = insert_job(job_offer, company_id, contact_id)
+                        job_id = insert_job(cursor, connection, job_offer, company_id, contact_id)
                         if not job_id:
                             logging.warning(f"Failed to insert job: {job_offer}")
                             continue
                            
-                        insert_contract(job_id, job_offer)
-                        salary_id = insert_salary(job_id, job_offer)
+                        insert_contract(cursor, connection, job_id, job_offer)
+                        salary_id = insert_salary(cursor, connection, job_id, job_offer)
                         if not salary_id:
                             logging.warning(f"Failed to insert salary: {job_offer}")
                             
-                        benefit_id = insert_benefits(salary_id, job_offer)
+                        benefit_id = insert_benefits(cursor, connection, salary_id, job_offer)
                         if not benefit_id:
                             logging.warning(f"Failed to insert benefit: {job_offer}")
                             
                        
                         
-                        insert_competencies(job_offer)
-                        insert_job_competency(job_id, job_offer)
+                        insert_competencies(cursor, connection, job_offer)
+                        insert_job_competency(cursor, connection, job_id, job_offer)
                         
-                        driver_license_id = insert_driver_license(job_offer)
+                        driver_license_id = insert_driver_license(cursor, connection, job_offer)
                         if not driver_license_id:
                             logging.warning(f"Failed to insert driver_license: {job_offer}")
                             
-                        insert_job_driver_license(job_id, driver_license_id, job_offer)
+                        insert_job_driver_license(cursor, connection, job_id, driver_license_id, job_offer)
                         
-                        insert_formation(job_id, job_offer)
-                        insert_professional_qualities(job_id, job_offer)
-                        insert_languages(job_id, job_offer)
+                        insert_formation(cursor, connection, job_id, job_offer)
+                        insert_professional_qualities(cursor, connection, job_id, job_offer)
+                        insert_languages(cursor, connection, job_id, job_offer)
                         
                         job_count+=1
                         
@@ -1551,14 +1545,14 @@ def load_data_to_db(OUTPUT_DIR, csv_file_path):
     # except Exception as e:
         # print("Erreur :", e) 
         
-def fill_missing_salaries():
+def fill_missing_salaries(cursor, connection):
     """Fill salaries empty rows with the average salary : 
     phase 1 : avg salary by rome_code by experience, 
     phase 2 : avg salary by rome_code
     phase 3 : avg salary
     phase 4 min_salaries lower than 10 are multiplied by 1000
     """
-    global cursor, connection
+    
     try:
         cursor.execute("SELECT rome_code from rome")
         rome_codes = cursor.fetchall()
@@ -1665,6 +1659,7 @@ def fill_missing_salaries():
         
 
 if __name__ == "__main__":
+    
     log_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output_log.txt")
     OUTPUT_DIR = os.path.dirname(os.path.abspath(__file__))  # Get the directory of the current script
     CSV_FILE_PATH = os.path.join(OUTPUT_DIR, 'french_departments.csv')  # relative path of the csv file
@@ -1673,14 +1668,15 @@ if __name__ == "__main__":
         #original_stdout = sys.stdout
         sys.stdout = log_file
         try:
-            establish_connection()
-            load_data_to_db(OUTPUT_DIR, CSV_FILE_PATH)
-            
+            cursor, connection = establish_connection()
+            insert_requirements(cursor, connection)
+            load_data_to_db(cursor, connection,OUTPUT_DIR, CSV_FILE_PATH)
+            fill_missing_salaries(cursor, connection)
     
         finally:
-            fill_missing_salaries()
+            
             logging.info(f"Program completed. Logs are saved in 'output_log.txt'.")
-            close_connection()
+            close_connection(cursor, connection)
             # Restore stdout to its original state
             #sys.stdout = original_stdout
 
