@@ -3,13 +3,13 @@ import json
 import os
 import time
 import csv
-import mysql.connector
 import re
 from mysql.connector import Error
 import sys
 from datetime import datetime
 import logging
 from database import get_db_persistent
+
 
 HOURS_PER_MONTH = 151.67
 WEEKS_PER_MONTH = 4.33
@@ -487,23 +487,25 @@ def insert_salary(cursor, connection, job_id, job_offer: dict):
                 logging.debug(f"Extracted salary_str from commentaire: {salary_str}")
                 salary_str = re.sub(r'\s+', ' ', salary_str)  # Ensure consistent spacing
                 salary_str = (
-                salary_str.replace("'","")
-                .replace("K", "k")
-                .replace(" k","k")
-                .replace("k","000")
-                .replace(",",".")
-                .replace(" 000","000")
-                .replace("?","")
-                .replace("€","")
-                .replace("Euros","")
-                .replace("E","")
-                .replace("euro","")
-                .replace("brut","")
-                .replace("BRUT","")
-                .replace("Brut","")
-                .replace("(","")
-                .replace(")","")
+                    salary_str.replace("'","")
+                    .replace("K", "k")
+                    .replace(" k","k")
+                    .replace("k","000")
+                    .replace(",",".")
+                    .replace(" 000","000")
+                    .replace("?","")
+                    .replace("€","")
+                    .replace("Euros","")
+                    .replace("E","")
+                    .replace("euro","")
+                    .replace("brut","")
+                    .replace("BRUT","")
+                    .replace("Brut","")
+                    .replace("(","")
+                    .replace(")","")
+                    .replace("*","")
                 )
+                
                 salary_str = add_space_around_numbers(salary_str)
                 salary_str=replace_space_between_numbers(salary_str)
                 logging.debug(f"Cleaned string : {salary_str}")
@@ -1546,120 +1548,140 @@ def load_data_to_db(cursor, connection, OUTPUT_DIR, csv_file_path):
         # print("Erreur :", e) 
         
 def fill_missing_salaries(cursor, connection):
-    """Fill salaries empty rows with the average salary : 
-    phase 1 : avg salary by rome_code by experience, 
-    phase 2 : avg salary by rome_code
-    phase 3 : avg salary
-    phase 4 min_salaries lower than 10 are multiplied by 1000
     """
-    
+    Fill missing salary values in four phases:
+    Phase 1: Use average salary by rome_code and experience.
+    Phase 2: Use average salary by rome_code.
+    Phase 3: Use overall average salary.
+    Phase 4: Fix very low salaries by multiplying by 1000.
+    """
     try:
-        cursor.execute("SELECT rome_code from rome")
-        rome_codes = cursor.fetchall()
-        experience=["D","S","E"]
-        for (rome_code,) in rome_codes:
-            for exp in experience:
-                update_query="""UPDATE salary 
-                SET max_monthly_salary = (
-                    SELECT round(AVG(a1.max_monthly_salary),2) AS avg_salary 
-                        FROM salary a1 JOIN job b1 ON a1.job_id = b1.job_id 
-                        WHERE a1.max_monthly_salary IS NOT NULL  
-                        AND a1.max_monthly_salary != 0  
-                        AND b1.rome_code = %s
-                        AND b1.experience_required = %s
-                        ), 
-                    min_monthly_salary= (
-                        SELECT round(AVG(a2.min_monthly_salary),2) AS avg_salary 
-                            FROM salary a2 JOIN job b2 ON a2.job_id = b2.job_id 
-                                WHERE a2.max_monthly_salary IS NOT NULL  
-                                AND a2.max_monthly_salary != 0  
-                                AND b2.rome_code = %s
-                                AND b2.experience_required = %s
-                                ) 
-                WHERE (max_monthly_salary = 0 OR max_monthly_salary IS NULL)
-                AND (min_monthly_salary = 0 OR min_monthly_salary IS NULL) 
-                AND job_id IN ( 
-                    SELECT a3.job_id FROM salary a3 JOIN job b3 
-                    ON a3.job_id = b3.job_id 
-                        WHERE b3.rome_code = %s
-                        AND b3.experience_required = %s)"""
-               
-                cursor.execute(update_query, (rome_code, exp, rome_code, exp, rome_code, exp))
-                logging.debug(f"Executed query: {cursor._executed}")
-            logging.info(f"empty salaries updated for rome_code {rome_code}")
-            connection.commit()
-        logging.info(f"update salaries phase 1 complete")
-        for (rome_code,) in rome_codes:
-            update_query2="""UPDATE salary 
-                SET max_monthly_salary = (
-                    SELECT round(AVG(a1.max_monthly_salary),2) AS avg_salary 
-                        FROM salary a1 JOIN job b1 ON a1.job_id = b1.job_id 
-                        WHERE a1.max_monthly_salary IS NOT NULL  
-                        AND a1.max_monthly_salary != 0  
-                        AND b1.rome_code = %s
-                       
-                        ), 
-                    min_monthly_salary= (
-                        SELECT round(AVG(a2.min_monthly_salary),2) AS avg_salary 
-                            FROM salary a2 JOIN job b2 ON a2.job_id = b2.job_id 
-                                WHERE a2.max_monthly_salary IS NOT NULL  
-                                AND a2.max_monthly_salary != 0  
-                                AND b2.rome_code = %s
-                                
-                                ) 
-                WHERE (max_monthly_salary = 0 OR max_monthly_salary IS NULL)
-                AND (min_monthly_salary = 0 OR min_monthly_salary IS NULL) 
-                AND job_id IN ( 
-                    SELECT a3.job_id FROM salary a3 JOIN job b3 
-                    ON a3.job_id = b3.job_id 
-                        WHERE b3.rome_code = %s
-                        )"""
-            cursor.execute(update_query2, (rome_code, rome_code, rome_code))
-            logging.debug(f"Executed query: {cursor._executed}")
-        connection.commit()    
-        logging.info(f"update salaries phase 2 complete")
-        update_query3="""UPDATE salary 
-                    SET max_monthly_salary = (
-                    SELECT round(AVG(a1.max_monthly_salary),2) AS avg_salary 
-                        FROM salary a1 JOIN job b1 ON a1.job_id = b1.job_id 
-                        WHERE a1.max_monthly_salary IS NOT NULL  
-                        AND a1.max_monthly_salary != 0  
-                        
-                       
-                        ), 
-                    min_monthly_salary= (
-                        SELECT round(AVG(a2.min_monthly_salary),2) AS avg_salary 
-                            FROM salary a2 JOIN job b2 ON a2.job_id = b2.job_id 
-                                WHERE a2.max_monthly_salary IS NOT NULL  
-                                AND a2.max_monthly_salary != 0  
-                                
-                                
-                                ) 
-                WHERE (max_monthly_salary = 0 OR max_monthly_salary IS NULL)
-                AND (min_monthly_salary = 0 OR min_monthly_salary IS NULL) 
-                AND job_id IN ( 
-                    SELECT a3.job_id FROM salary a3 JOIN job b3 
-                    ON a3.job_id = b3.job_id 
-                        
-                        )"""
-        cursor.execute(update_query3)
-        logging.info(f"update salaries phase 3 complete")
+        # Fetch all rome_codes
+        cursor.execute("SELECT rome_code FROM rome")
+        rome_codes = [row[0] for row in cursor.fetchall()]
+        experiences = ["D", "S", "E"]
+
+        # Create a temporary table for performance optimization
+        cursor.execute("""
+            CREATE TEMPORARY TABLE temp_avg_salaries AS
+            SELECT b.rome_code, b.experience_required, 
+                   ROUND(AVG(a.max_monthly_salary), 2) AS avg_max_salary,
+                   ROUND(AVG(a.min_monthly_salary), 2) AS avg_min_salary
+            FROM salary a
+            JOIN job b ON a.job_id = b.job_id
+            WHERE a.max_monthly_salary IS NOT NULL 
+                  AND a.max_monthly_salary > 0
+                  AND a.min_monthly_salary IS NOT NULL
+                  AND a.min_monthly_salary > 0
+            GROUP BY b.rome_code, b.experience_required
+        """)
         connection.commit()
-        update_query4="""UPDATE salary
-                            SET min_monthly_salary = min_monthly_salary *1000 where min_monthly_salary < 10
-                            """
-        cursor.execute(update_query4)
-        logging.debug(f"Executed query: {cursor._executed}")
-        logging.info(f"update salaries phase 4 complete")
+
+        # Phase 1: Update salary using experience-specific averages
+        update_query = """
+            UPDATE salary s
+            JOIN temp_avg_salaries t ON s.job_id IN (
+                SELECT job_id FROM job 
+                WHERE rome_code = t.rome_code AND experience_required = t.experience_required
+            )
+            SET s.max_monthly_salary = t.avg_max_salary,
+                s.min_monthly_salary = t.avg_min_salary
+            WHERE (s.max_monthly_salary = 0 OR s.max_monthly_salary IS NULL)
+              AND (s.min_monthly_salary = 0 OR s.min_monthly_salary IS NULL)
+        """
+        cursor.execute(update_query)
         connection.commit()
-       
+        logging.info("Update salaries phase 1 complete")
+
+        # Phase 2: Use rome_code-level average salary
+        cursor.execute("""
+            UPDATE salary s
+            JOIN (
+                SELECT rome_code,
+                       ROUND(AVG(avg_max_salary), 2) AS avg_max_salary,
+                       ROUND(AVG(avg_min_salary), 2) AS avg_min_salary
+                FROM temp_avg_salaries
+                GROUP BY rome_code
+            ) t ON s.job_id IN (SELECT job_id FROM job WHERE rome_code = t.rome_code)
+            SET s.max_monthly_salary = t.avg_max_salary,
+                s.min_monthly_salary = t.avg_min_salary
+            WHERE (s.max_monthly_salary = 0 OR s.max_monthly_salary IS NULL)
+              AND (s.min_monthly_salary = 0 OR s.min_monthly_salary IS NULL)
+        """)
+        connection.commit()
+        logging.info("Update salaries phase 2 complete")
+
+        # Phase 3: Use overall average salary if still missing
+        cursor.execute("""
+            UPDATE salary
+            SET max_monthly_salary = (SELECT ROUND(AVG(avg_max_salary), 2) FROM temp_avg_salaries),
+                min_monthly_salary = (SELECT ROUND(AVG(avg_min_salary), 2) FROM temp_avg_salaries)
+            WHERE (max_monthly_salary = 0 OR max_monthly_salary IS NULL)
+              AND (min_monthly_salary = 0 OR min_monthly_salary IS NULL)
+        """)
+        connection.commit()
+        logging.info("Update salaries phase 3 complete")
+
+        # Phase 4: Fix salaries lower than 10
+        cursor.execute("""
+            UPDATE salary
+            SET min_monthly_salary = min_monthly_salary * 1000
+            WHERE min_monthly_salary < 10
+        """)
+        connection.commit()
+        logging.info("Update salaries phase 4 complete")
+
+        # Drop the temporary table
+        cursor.execute("DROP TEMPORARY TABLE temp_avg_salaries")
+        connection.commit()
         
     except Error as e:
-        logging.exception("Error while updating salary for naf_code {naf_code} {e}")
-        
+        logging.exception(f"Error while updating salary: {e}")
+        connection.rollback()
 
-if __name__ == "__main__":
+def create_views(cursor, connection):
+    """
+    Create views for job, salary, and job_contract tables.
+    """
+    queries = ["""create view salary_per_dept AS (
+               SELECT COUNT(*), left(insee_code,2) dept, 
+                case when b.max_monthly_salary BETWEEN 0 AND 1000 then '0-1000'
+			         when b.max_monthly_salary BETWEEN 1000 AND 2000 then '1000-2000'
+			         when b.max_monthly_salary BETWEEN 2000 AND 3000 then '2000-3000'
+			         when b.max_monthly_salary BETWEEN 3000 AND 4000 then '3000-4000'
+			         when b.max_monthly_salary > 4000 then '4000+' 
+                END AS salary_range
+            from job a JOIN salary b ON a.job_id = b.job_id 
+			GROUP BY dept, salary_range HAVING salary_range IS NOT null 
+            order BY dept, salary_range
+               )""",
+            """create view most_wanted AS(
+                with cte AS (
+                    SELECT COUNT(a.job_id) cnt, LEFT(a.insee_code,2) dept , b.label, ROW_NUMBER() OVER(PARTITION BY LEFT(insee_code, 2) 
+                    ORDER BY COUNT(a.job_id) DESC
+                    ) AS RANK_job
+                    FROM job a JOIN rome b ON a.rome_code = b.rome_code GROUP BY b.label, dept ORDER BY dept, cnt DESC, rank_job)
+                SELECT * FROM cte WHERE rank_job <= 30
+                )""",
+            """create view jobs_per_companies as(
+                with cte AS (
+                    SELECT COUNT(job_id) cnt, LEFT(insee_code,2) dept, b.name, ROW_NUMBER() OVER (PARTITION BY LEFT(insee_code,2) 
+                    ORDER BY COUNT(job_id) DESC 
+                    ) AS rank_ent 
+                 FROM job a JOIN companies b ON a.company_id = b.company_id
+                 GROUP BY  b.name, dept  
+                 ORDER BY dept, cnt DESC, rank_ent)
+                SELECT * FROM cte WHERE rank_ent <=50)"""]
     
+    try:
+        for query in queries:
+            cursor.execute(query)
+            connection.commit()
+            logging.info(f"View created successfully: {query}")
+    except Error as e:
+        logging.exception(f"Error creating view: {e}")
+
+def main():
     log_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output_log.txt")
     OUTPUT_DIR = os.path.dirname(os.path.abspath(__file__))  # Get the directory of the current script
     CSV_FILE_PATH = os.path.join(OUTPUT_DIR, 'french_departments.csv')  # relative path of the csv file
@@ -1672,14 +1694,17 @@ if __name__ == "__main__":
             insert_requirements(cursor, connection)
             load_data_to_db(cursor, connection,OUTPUT_DIR, CSV_FILE_PATH)
             fill_missing_salaries(cursor, connection)
+            create_views(cursor, connection)
     
         finally:
             
             logging.info(f"Program completed. Logs are saved in 'output_log.txt'.")
             close_connection(cursor, connection)
-            # Restore stdout to its original state
-            #sys.stdout = original_stdout
+        
 
+if __name__ == "__main__":
+    
+    main()
     
     
 
