@@ -1682,9 +1682,7 @@ def create_views(cursor, connection):
         logging.exception(f"Error creating view: {e}")
 
 def main():
-    log_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output_log.txt")
-    OUTPUT_DIR = os.path.dirname(os.path.abspath(__file__))  # Get the directory of the current script
-    CSV_FILE_PATH = os.path.join(OUTPUT_DIR, 'french_departments.csv')  # relative path of the csv file
+   
     with open(log_file_path, "w") as log_file:
         # Redirect stdout to the log file
         #original_stdout = sys.stdout
@@ -1703,6 +1701,9 @@ def main():
         
 
 if __name__ == "__main__":
+    log_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output_log.txt")
+    OUTPUT_DIR = os.path.dirname(os.path.abspath(__file__))  # Get the directory of the current script
+    CSV_FILE_PATH = os.path.join(OUTPUT_DIR, 'french_departments.csv')  # relative path of the csv file
     
     main()
     
