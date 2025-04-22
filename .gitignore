@@ -1,3 +1,4 @@
 clientCredentials.json
 output_log.txt
 .env
+.env.test

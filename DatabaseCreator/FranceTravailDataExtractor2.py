@@ -1,14 +1,14 @@
-import requests
+import requests # type: ignore
 import json
 import os
 import time
 import csv
 import re
-from mysql.connector import Error
+from mysql.connector import Error # type: ignore
 import sys
 from datetime import datetime
 import logging
-from database import get_db_persistent
+from .database import get_db_persistent
 
 
 HOURS_PER_MONTH = 151.67

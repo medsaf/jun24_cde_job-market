@@ -1,15 +1,11 @@
-import mysql.connector
+import mysql.connector 
 import logging
-import os
 from contextlib import contextmanager
-from dotenv import load_dotenv
-
-
-load_dotenv(dotenv_path=".env.test") # Load environment variables from .env file
+import os
 
 class DatabaseConfig:
     """Database configuration class to store connection parameters."""
-    def __init__(self, host=os.getenv("DB_HOST", "localhost"), database=os.getenv("DB_NAME", "mydb"), user=os.getenv("DB_USER", "root"), password=os.getenv("DB_PASSWORD", ""), port=os.getenv("DB_PORT", "3306"), charset='utf8mb4'):
+    def __init__(self, host=os.getenv("DB_HOST", "mysql"), database=os.getenv("DB_NAME", "ft"), user=os.getenv("DB_USER"), password=os.getenv("DB_PASSWORD", ""), port=os.getenv("DB_PORT", "3306"), charset='utf8mb4'):
         self.host = host
         self.database = database
         self.user = user
@@ -27,18 +23,6 @@ class DatabaseConfig:
             port=self.port,
             charset=self.charset
         )
-
-def get_Elasticsearch():
-    """Create and return an Elasticsearch client."""
-    from elasticsearch import Elasticsearch
-    es_config = {
-        "hosts": [{
-            "host": os.getenv("ES_HOST", "localhost"),
-            "port": int(os.getenv("ES_PORT", 9200)),
-            "scheme": "http"  # Use "https" if your cluster is set up to use SSL
-        }]
-    }
-    return Elasticsearch(**es_config)
 
 
 # Instantiate the DatabaseConfig

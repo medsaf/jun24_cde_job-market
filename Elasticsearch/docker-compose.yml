@@ -1,59 +1,43 @@
-version: "3.0"
+version: "3.8"
 
 services:
-  elasticsearch:
-    container_name: es-container
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.1.2
+  mysql:
+    image: mysql:8
+    container_name: mysql
+    restart: always
+    env_file: 
+      - .env
     environment:
-      - xpack.security.enabled=false
-      - discovery.type=single-node
-    networks:
-      - es-net
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
     ports:
-      - 9200:9200
-    deploy:
-      resources:
-        limits:
-          cpus: '0.4'
-          memory: 2.2g
-
-  logstash:
-    container_name: ls-container
-    image: docker.elastic.co/logstash/logstash:8.1.2
-    environment:
-      - ELASTIC_HOSTS=http://es-container:9200
+      - "3306:3306"
     volumes:
-      - ./requirements/logstash/data/to_ingest:/usr/share/logstash/data/to_ingest
-      - ./requirements/logstash/config:/usr/share/logstash/config
-      - ./requirements/logstash/pipeline:/usr/share/logstash/pipeline
-    networks:
-      - es-net
-    depends_on:
-      - elasticsearch
-    entrypoint: [ "/bin/bash", "-c", "tail -f /dev/null" ]
-    deploy:
-      resources:
-        limits:
-          cpus: '0.1'
-          memory: 1g
+      - mysql_data:/var/lib/mysql
+      - ./db_dataDatabaseCreator/France_Travail_create_db.sql:/docker-entrypoint-initdb.d/database.sql
 
-  kibana:
-    container_name: kb-container
-    image: docker.elastic.co/kibana/kibana:8.1.2
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.6.2
+    container_name: elasticsearch
     environment:
-      - ELASTICSEARCH_HOSTS=http://es-container:9200
-    networks:
-      - es-net
-    depends_on:
-      - elasticsearch
+      - "discovery.type=single-node"
+      - "xpack.security.enabled=false"
     ports:
-      - 5601:5601
-    deploy:
-      resources:
-        limits:
-          cpus: '0.3'
-          memory: 1g
+      - "${ELASTICSEARCH_PORT}:9200"
+    volumes:
+      - elastic_data:/usr/share/elasticsearch/data
 
-networks:
-  es-net:
-    driver: bridge
+  sync_service:
+    build: ./sync_service
+    container_name: sync_service
+    env_file:
+      - .env
+    depends_on:
+      - mysql
+      - elasticsearch
+
+volumes:
+  mysql_data:
+  elastic_data:

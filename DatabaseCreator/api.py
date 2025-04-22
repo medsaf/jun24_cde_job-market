@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional
-from DatabaseCreator.database import get_db, get_Elasticsearch # Import new database function
+from database import get_db, get_Elasticsearch # Import new database function
 from elasticsearch import Elasticsearch
 import os
 
