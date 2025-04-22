@@ -1,5 +1,7 @@
 from setuptools import setup, find_packages
 
+# pip install -e .
+# This will install the package in "editable" mode, meaning changes to the code will be reflected immediately without needing to reinstall.
 setup(
     name="jun24_cde_job-market",  # Package name
     version="0.1",  # Package version
