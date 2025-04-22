@@ -1,10 +1,10 @@
-import requests # type: ignore
+import requests 
 import json
 import os
 import time
 import csv
 import re
-from mysql.connector import Error # type: ignore
+from mysql.connector import Error 
 import sys
 from datetime import datetime
 import logging
