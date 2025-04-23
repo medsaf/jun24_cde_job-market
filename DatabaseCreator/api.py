@@ -2,13 +2,33 @@ from fastapi import FastAPI, Depends, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional
 from database import get_db, get_Elasticsearch # Import new database function
+from getPredictions import *
 from elasticsearch import Elasticsearch
 import os
 
 app = FastAPI()
 
 
+"""python3 -m uvicorn main:api --reload"""
 
+mysql_user = "root"
+
+mysql_password = "password"
+
+mysql_host = "127.0.0.1"
+
+#mysql_host = "192.168.49.2"
+
+
+mysql_port = 8000
+
+#mysql_port = 51980
+
+
+mysql_database = "francetravail"
+
+
+"""python3 -m uvicorn main:api --reload"""
 
 es = get_Elasticsearch()  # Initialize Elasticsearch client
 
@@ -92,4 +112,9 @@ def search_jobs(payload: SearchPayload, db=Depends(get_db)):
     result = search_in_mysql(matching_ids)
     
     return result
-    
+
+
+####  salary prediction
+@app.get("/salary/{id:int}")
+def get_salary(id):
+    return ({"Salary class": str(getPrediction(id))})

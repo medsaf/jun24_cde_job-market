@@ -1,0 +1,8 @@
+mysql-connector==2.2.9
+pandas==2.0.3
+pathlib==1.0.1
+pymysql==1.1.1
+requests==2.31.0
+sqlalchemy==1.1.12
+libmariadb-dev
+mariadb==1.1.12
