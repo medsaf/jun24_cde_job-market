@@ -15,16 +15,22 @@ from sklearn.pipeline import Pipeline
 from sklearn.ensemble import RandomForestClassifier
 import mlflow
 from mlflow.models import infer_signature
+from joblib import dump
+import mysql.connector
+
 
 
 try:
     conn = mariadb.connect(
         user="root",
         password="password",
-        host="127.0.0.1",
-        port=8000,
-        database="francetravail"
-
+        #host="127.0.0.1",
+        host="192.168.49.2",
+        #port=8000,
+        port=30000,
+        #port=3306,
+        #database="francetravail"
+        database="database"
     )
 except mariadb.Error as e:
     print(f"Error connecting to MariaDB Platform: {e}")
@@ -89,7 +95,7 @@ X_test=X_test[X_test["rome_code"].isin(X_train["rome_code"])]
 y_test=y_test[y_test.index.isin(X_test.index)]
 accuracy=estimator.score(X_test,y_test)
 
-##### Save model 
+""" ##### Save model 
 mlflow.set_tracking_uri(uri="http://127.0.0.1:8080")
 
 params = {
@@ -132,5 +138,12 @@ model_uri = f"models:/{model_name}/{model_version}"
 model = mlflow.sklearn.load_model(model_uri)
 predictions = model.predict(X_test)
 
+ """
+##### Save model 
+def save_model(model,path_to_model='./MachineLearningModel/savedModels/model.pckl'):
+    # training the model
+    # saving model
+    print(str(model), 'saved at ', path_to_model)
+    dump(model, path_to_model)
 
-
+save_model(estimator,path_to_model="C:/Users/medsa/Desktop/projet_DE/FastAPI/savedModels/model.pckl")

@@ -1,8 +1,12 @@
-mysql-connector==2.2.9
+mysql-connector-python
 pandas==2.0.3
 pathlib==1.0.1
 pymysql==1.1.1
 requests==2.31.0
 sqlalchemy==1.1.12
-libmariadb-dev
-mariadb==1.1.12
+uvicorn==0.33.0
+fastapi==0.115.11
+elasticsearch==9.0.0
+python-dotenv
+joblib==1.2.0
+scikit-learn==1.2.2

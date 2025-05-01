@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastapi
+spec:
+  selector:
+    matchLabels:
+      app: fastapi
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: fastapi  
+    spec:
+      containers:
+        - name: fastapi
+          image: docker.io/medsaf97/fastapitest:latest
+          env:
+            - name: SQL_PASSWORD
+              value: user
+            - name: SQL_DATABASE
+              value: database
+            - name: SQL_HOST
+              value:  10.98.205.130
+            - name: SQL_USER
+              value: user
+          command: ["uvicorn"]
+          args: ["main:app", "--host", "0.0.0.0", "--port", "8000"]

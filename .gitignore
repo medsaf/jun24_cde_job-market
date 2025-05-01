@@ -2,3 +2,5 @@ clientCredentials.json
 output_log.txt
 .env
 .env.test
+dump_france_travail.sql
+France_Travail_create_db.sql

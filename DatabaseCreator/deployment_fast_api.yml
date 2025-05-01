@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastapi
+spec:
+  selector:
+    matchLabels:
+      app: fastapi
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: fastapi  
+    spec:
+      containers:
+        - name: fastapi
+          image: medsaf97/fastapi_deploy:latest
+          env:
+            - name: SQL_PASSWORD
+              value: password
+            - name: SQL_DATABASE
+              value: francetravail
+            - name: SQL_HOST
+              value: sqlclusterip.default.svc.cluster.local
+            - name : SQL_PORT
+              value: "3306"
+            - name: SQL_USER
+              value: root
+          command: ["uvicorn"]
+          args: ["api:app", "--host", "0.0.0.0", "--port", "8000"]

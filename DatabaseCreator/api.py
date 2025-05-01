@@ -11,19 +11,24 @@ app = FastAPI()
 
 """python3 -m uvicorn main:api --reload"""
 
-mysql_user = "root"
+""" os.environ["mysql_user"]="root"
+os.environ["mysql_passowrd"]="password"
+os.environ["mysql_host"]="127.0.0.1"
+os.environ["mysql_port"]="8000" """
 
+""" mysql_user = "root"
 mysql_password = "password"
-
 mysql_host = "127.0.0.1"
-
 #mysql_host = "192.168.49.2"
-
-
 mysql_port = 8000
-
 #mysql_port = 51980
-
+ """
+mysql_user = os.getenv("mysql_user")
+mysql_password = os.getenv("mysql_password")
+mysql_host = os.getenv("mysql_host")
+mysql_port = os.getenv("mysql_port")
+#mysql_host = "192.168.49.2"
+#mysql_port = 51980
 
 mysql_database = "francetravail"
 
