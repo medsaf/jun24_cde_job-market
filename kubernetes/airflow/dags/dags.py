@@ -2,7 +2,7 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.utils.dates import days_ago
 import random
-from FranceTravailDataExtractor2.py import *
+from FranceTravailDataExtractor2 import *
 
 
 with DAG(
