@@ -15,4 +15,6 @@ with DAG(
         task_id='python_task',
         python_callable=Extract_and_load_data
     )
-    my_task 
+
+
+    load_and_extract 
