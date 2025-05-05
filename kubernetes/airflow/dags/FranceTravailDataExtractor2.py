@@ -8,7 +8,7 @@ from mysql.connector import Error
 import sys
 from datetime import datetime
 import logging
-from .database import get_db_persistent
+from database import get_db_persistent
 
 
 HOURS_PER_MONTH = 151.67
