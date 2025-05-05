@@ -13,6 +13,6 @@ with DAG(
 
     load_and_extract = PythonOperator(
         task_id='python_task',
-        python_callable=load_and_extract
+        python_callable=Extract_and_load_data
     )
     my_task 
