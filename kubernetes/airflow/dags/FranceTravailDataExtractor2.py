@@ -1365,14 +1365,14 @@ def establish_connection(log_file_path="logs.txt"):
     
     
     
-    logging.basicConfig(
+   """  logging.basicConfig(
     level=logging.DEBUG,  
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
             logging.FileHandler(log_file_path),  # Log to a file
             logging.StreamHandler()         # Log to the console
     ]
-    )
+    ) """
     
    
     
