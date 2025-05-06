@@ -1361,7 +1361,7 @@ def fetch_all_job_offers(department_code, rome_code, token_type, token):
 
 
 
-def establish_connection():
+def establish_connection(log_file_path="logs.txt"):
     
     
     
