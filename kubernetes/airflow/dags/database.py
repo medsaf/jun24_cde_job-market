@@ -15,7 +15,7 @@ class DatabaseConfig:
         self.user = user
         self.password = password
         self.port = port
-        self.charset = charset
+        #self.charset = charset
 
     def get_connection(self):
         """Create and return a connection based on the config."""
@@ -24,8 +24,8 @@ class DatabaseConfig:
             database=self.database,
             user=self.user,
             password=self.password,
-            port=self.port,
-            charset=self.charset
+            port=self.port
+            #charset=self.charset
         )
 
 def get_Elasticsearch():
