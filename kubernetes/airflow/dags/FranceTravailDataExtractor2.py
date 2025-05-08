@@ -1689,7 +1689,7 @@ def main():
             if connection.is_connected():
                 print("Connected to MySQL database")
             
-            #insert_requirements(cursor, connection)
+            insert_requirements(cursor, connection)
             load_data_to_db(cursor, connection,OUTPUT_DIR, CSV_FILE_PATH)
             #fill_missing_salaries(cursor, connection)
             #create_views(cursor, connection)
