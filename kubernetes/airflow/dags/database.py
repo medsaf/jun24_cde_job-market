@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 
 class DatabaseConfig:
     """Database configuration class to store connection parameters."""
-    def __init__(self, host=os.getenv("DB_HOST", "sqlclusterip.default.svc.cluster.local"), database=os.getenv("DB_NAME", "francetravail"), user=os.getenv("DB_USER", "root"), password=os.getenv("DB_PASSWORD", "password"), port=os.getenv("DB_PORT", "3306"), charset='u tf8mb4'):
+    def __init__(self, host=os.getenv("DB_HOST", "sqlclusterip.default.svc.cluster.local"), database=os.getenv("DB_NAME", "francetravail"), user=os.getenv("DB_USER", "root"), password=os.getenv("DB_PASSWORD", "password"), port=os.getenv("DB_PORT", "3306")):
         self.host = host
         self.database = database
         self.user = user
