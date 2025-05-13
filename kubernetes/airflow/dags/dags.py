@@ -16,5 +16,4 @@ with DAG(
         python_callable=Extract_and_load_data
     )
 
-
     load_and_extract 

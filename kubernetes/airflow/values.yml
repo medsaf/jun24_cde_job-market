@@ -2768,10 +2768,10 @@ dags:
     # ssh example: git@github.com:apache/airflow.git
     # https example: https://github.com/apache/airflow.git
     repo: https://github.com/medsaf/jun24_cde_job-market.git
-    branch: main
+    branch: master
     rev: HEAD
     # The git revision (branch, tag, or hash) to check out, v4 only
-    ref: main
+    ref: V2-2-stable
     depth: 1
     # the number of consecutive failures allowed before aborting
     maxFailures: 0
