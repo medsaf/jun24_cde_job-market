@@ -18,7 +18,7 @@ def get_credentials(OUTPUT_DIR: str) -> dict[str, str]:
     """
     Récupère les accréditations à partir d'un fichier JSON.
     """
-    with open(os.path.join(OUTPUT_DIR, "clientCredentials.json"), "r") as idFile:
+    with open(os.path.join(OUTPUT_DIR, "client_credentials.json"), "r") as idFile:
         logging.debug(os.path.join(OUTPUT_DIR, "client_credentials.json"))
         return json.load(idFile)
 
