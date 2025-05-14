@@ -14,7 +14,7 @@ from database import get_db_persistent
 HOURS_PER_MONTH = 151.67
 WEEKS_PER_MONTH = 4.33
 
-def get_credentials(OUTPUT_DIR: str) -> dict[str, str]:
+def get_credentials() -> dict[str, str]:
     """
     Récupère les accréditations à partir d'un fichier JSON.
     """
@@ -1424,13 +1424,13 @@ def load_department_codes(csv_file_path: str) -> list[str]:
         raise
         
 
-def load_data_to_db(cursor, connection, OUTPUT_DIR, csv_file_path):
+def load_data_to_db(cursor, connection,  csv_file_path):
     """
     Fetches job offers for each department code and inserts them into the database.
     """
     try:
         # Step 1: Fetch credentials and access token
-        credentials = get_credentials(OUTPUT_DIR)
+        credentials = get_credentials()
         client_id = credentials["clientID"]
         client_secret = credentials["key"]
 
