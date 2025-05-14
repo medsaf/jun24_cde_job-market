@@ -1521,7 +1521,7 @@ def load_data_to_db(cursor, connection, OUTPUT_DIR, csv_file_path):
     finally:           # Commit all changes after processing all department codes
     
         #logging.info(f"Data insertion completed for {department_count}/{len(department_codes)} departments.")
-        #logging.info(f" {job_count} job offers inserted")
+        logging.info("job offers inserted")
 # def Extract_data(OUTPUT_DIR):
     # credentials = get_credentials(OUTPUT_DIR=OUTPUT_DIR)
     # client_id = credentials["clientID"]
