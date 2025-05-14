@@ -17,10 +17,17 @@ with DAG(
         python_callable=Extract_and_load_data
     )
 
+    load_and_extract
+
+with DAG(
+    dag_id='train_model',
+    schedule_interval=None,
+    start_date=days_ago(0)
+) as my_dag:
+
     train_model = PythonOperator(
         task_id='python_task',
         python_callable=update_model
     )
-     
-    [load_and_extract,train_model]
+    train_model
 
