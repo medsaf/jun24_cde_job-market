@@ -14,12 +14,12 @@ from database import get_db_persistent
 HOURS_PER_MONTH = 151.67
 WEEKS_PER_MONTH = 4.33
 
-def get_credentials() -> dict[str, str]:
+def get_credentials(OUTPUT_DIR: str) -> dict[str, str]:
     """
     Récupère les accréditations à partir d'un fichier JSON.
     """
-    with open("client_credentials.json", "r") as idFile:
-        logging.debug( "client_credentials.json")
+    with open(os.path.join(OUTPUT_DIR, "client_credentials.json"), "r") as idFile:
+        logging.debug(os.path.join(OUTPUT_DIR, "client_credentials.json"))
         return json.load(idFile)
 
 def get_access_token(client_id: str, client_secret: str) -> tuple[str, str]:
@@ -1424,13 +1424,13 @@ def load_department_codes(csv_file_path: str) -> list[str]:
         raise
         
 
-def load_data_to_db(cursor, connection,  csv_file_path):
+def load_data_to_db(cursor, connection, OUTPUT_DIR, csv_file_path):
     """
     Fetches job offers for each department code and inserts them into the database.
     """
     try:
         # Step 1: Fetch credentials and access token
-        credentials = get_credentials()
+        credentials = get_credentials(OUTPUT_DIR)
         client_id = credentials["clientID"]
         client_secret = credentials["key"]
 
@@ -1700,10 +1700,11 @@ def main():
             close_connection(cursor, connection)
         
 
-def Extract_and_load_data(CSV_FILE_PATH="kubernetes/airflow/dags/french_departments.csv"):
+def Extract_and_load_data(OUTPUT_DIR="kubernetes/airflow/dags",CSV_FILE_PATH="kubernetes/airflow/dags/french_departments.csv"):
     cursor, connection = establish_connection()
     insert_requirements(cursor, connection)
-    load_data_to_db(cursor, connection, CSV_FILE_PATH)
+    print(os.getcwd())
+    load_data_to_db(cursor, connection,OUTPUT_DIR, CSV_FILE_PATH)
     fill_missing_salaries(cursor, connection)
     
 if __name__ == "__main__":
