@@ -16,11 +16,7 @@ import mysql.connector
 
 
 
-user="root"
-password="password"
-host="sqlclusterip.default.svc.cluster.local"
-port=3306
-database="francetravail"
+
 
 """ user="root"
 password="password"
@@ -114,7 +110,12 @@ def save_model(model,path_to_model='dags/repo/kubernetes/airflow/dags/savedModel
 
 
 
-def update_model(path_to_model="dags/repo/kubernetes/airflow/dags/savedModels/model_V2.pckl")
+def update_model(path_to_model="dags/repo/kubernetes/airflow/dags/savedModels/model_V2.pckl"):
+    user="root"
+    password="password"
+    host="sqlclusterip.default.svc.cluster.local"
+    port=3306
+    database="francetravail"
     estimator=load_and_format_data_and_create_model(user=user,password=password,host=host,port=port,database=database)
     save_model(estimator,path_to_model=path_to_model)
 
