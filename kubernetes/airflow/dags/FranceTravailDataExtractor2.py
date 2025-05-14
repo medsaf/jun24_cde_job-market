@@ -1700,7 +1700,7 @@ def main():
             close_connection(cursor, connection)
         
 
-def Extract_and_load_data(OUTPUT_DIR="dags/repo/kubernetes/airflow/dags",CSV_FILE_PATH="kubernetes/airflow/dags/french_departments.csv"):
+def Extract_and_load_data(OUTPUT_DIR="dags/repo/kubernetes/airflow/dags",CSV_FILE_PATH="dags/repo/kubernetes/airflow/dags/french_departments.csv"):
     cursor, connection = establish_connection()
     insert_requirements(cursor, connection)
     load_data_to_db(cursor, connection,OUTPUT_DIR, CSV_FILE_PATH)
