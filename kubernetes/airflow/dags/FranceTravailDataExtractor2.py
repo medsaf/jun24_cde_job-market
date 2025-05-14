@@ -18,8 +18,8 @@ def get_credentials(OUTPUT_DIR: str) -> dict[str, str]:
     """
     Récupère les accréditations à partir d'un fichier JSON.
     """
-    with open(os.path.join(OUTPUT_DIR, "client_credentials.json"), "r") as idFile:
-        logging.debug(os.path.join(OUTPUT_DIR, "client_credentials.json"))
+    with open("client_credentials.json", "r") as idFile:
+        logging.debug( "client_credentials.json")
         return json.load(idFile)
 
 def get_access_token(client_id: str, client_secret: str) -> tuple[str, str]:
@@ -1700,10 +1700,10 @@ def main():
             close_connection(cursor, connection)
         
 
-def Extract_and_load_data(OUTPUT_DIR="kubernetes/airflow/dags",CSV_FILE_PATH="kubernetes/airflow/dags/french_departments.csv"):
+def Extract_and_load_data(CSV_FILE_PATH="kubernetes/airflow/dags/french_departments.csv"):
     cursor, connection = establish_connection()
     insert_requirements(cursor, connection)
-    load_data_to_db(cursor, connection,OUTPUT_DIR, CSV_FILE_PATH)
+    load_data_to_db(cursor, connection, CSV_FILE_PATH)
     fill_missing_salaries(cursor, connection)
     
 if __name__ == "__main__":
