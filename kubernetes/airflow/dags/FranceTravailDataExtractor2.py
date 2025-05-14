@@ -19,7 +19,7 @@ def get_credentials(OUTPUT_DIR: str) -> dict[str, str]:
     Récupère les accréditations à partir d'un fichier JSON.
     """
     with open(os.path.join(OUTPUT_DIR, "clientCredentials.json"), "r") as idFile:
-        logging.debug(os.path.join(OUTPUT_DIR, "clientCredentials.json"))
+        logging.debug(os.path.join(OUTPUT_DIR, "client_credentials.json"))
         return json.load(idFile)
 
 def get_access_token(client_id: str, client_secret: str) -> tuple[str, str]:
