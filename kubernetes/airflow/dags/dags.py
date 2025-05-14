@@ -3,6 +3,7 @@ from airflow.operators.python import PythonOperator
 from airflow.utils.dates import days_ago
 import random
 from FranceTravailDataExtractor2 import *
+from Final_model import *
 
 
 with DAG(
@@ -16,4 +17,10 @@ with DAG(
         python_callable=Extract_and_load_data
     )
 
-    load_and_extract 
+    train_model = PythonOperator(
+        task_id='python_task',
+        python_callable=update_model
+    )
+     
+    [load_and_extract,train_model]
+
